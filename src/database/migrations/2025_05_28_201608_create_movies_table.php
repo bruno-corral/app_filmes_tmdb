@@ -22,6 +22,9 @@ return new class extends Migration
             $table->float('vote_average')->nullable();
             $table->float('vote_count')->nullable();
             $table->boolean('adult')->nullable();
+            $table->string('backdrop_path')->nullable();
+            $table->string('original_language')->nullable();
+            $table->boolean('video')->nullable();
             $table->json('genre_ids')->nullable();
             $table->timestamps();
         });

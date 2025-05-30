@@ -59,11 +59,15 @@ class MoviesController extends Controller
      */
     public function showFavoriteMovies(Request $request): JsonResponse
     {
-        $filters = $request->query();
+        $filters = $request->only([
+            'language',
+            'page',
+            'sort_by',
+        ]);
 
         $filters = array_intersect_key($filters, array_flip(['language', 'page', 'sort_by']));
 
-        $movies = $this->moviesApiService->getFavoriteMovies($filters);
+        $movies = $this->moviesApiService->getFavoriteMovies($filters, $request->method());
 
         if (empty($movies['results'])) {
             return response()->json([
@@ -103,6 +107,52 @@ class MoviesController extends Controller
             'data'    => $movie,
         ]);
         
+    }
+
+    public function storeFavoriteMovie(Request $request)
+    {
+        $data = $request->only([
+            'media_type',
+            'media_id',
+            'favorite',
+        ]);
+
+        $sessionId = $request->query('session_id');
+
+        $movieCreatedOnApi = $this->moviesApiService->addFavoriteMovie($data, $sessionId);
+
+        if ($movieCreatedOnApi['success'] === false) {
+            return [
+                'data' => $movieCreatedOnApi['data']
+            ];
+        }
+
+        $favoriteMovies = $this->showFavoriteMovies($request, $request->method());
+
+        $lastMovie = collect(collect($favoriteMovies)->get('original')['data']['results'])->last();
+
+        $data = [
+            'tmdb_id' => $lastMovie['id'],
+            'title' => $lastMovie['original_title'],
+            'overview' => $lastMovie['overview'],
+            'popularity' => $lastMovie['popularity'],
+            'poster_path' => $lastMovie['poster_path'],
+            'release_date' => $lastMovie['release_date'],
+            'vote_average' => $lastMovie['vote_average'],
+            'vote_count' => $lastMovie['vote_count'],
+            'adult' => $lastMovie['adult'],
+            'backdrop_path' => $lastMovie['backdrop_path'],
+            'original_language' => $lastMovie['original_language'],
+            'video' => $lastMovie['video'],
+            'genre_ids' => $lastMovie['genre_ids'],
+        ];
+
+        $movie = $this->moviesRepository->store($data);
+
+        return response()->json([
+            'message' => 'Movie created successfully.',
+            'data'    => $movie,
+        ]);
     }
 
     /**

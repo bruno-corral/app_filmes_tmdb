@@ -9,6 +9,8 @@ class Movie extends Model
     protected $table = 'movies';
 
     protected $casts = [
+        'adult' => 'boolean',
+        'video' => 'boolean',
         'genre_ids' => 'array',
     ];
 
@@ -22,6 +24,9 @@ class Movie extends Model
         'vote_average',
         'vote_count',
         'adult',
+        'backdrop_path',
+        'original_language',
+        'video',
         'genre_ids',
     ];
 }

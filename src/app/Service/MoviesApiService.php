@@ -10,24 +10,82 @@ class MoviesApiService
 {
     /**
      * @param array $filters = ['language', 'page', 'sort_by']
+     * @param string $method
      * @return JsonResponse | array
      */
-    public function getFavoriteMovies(array $filters = []): JsonResponse | array
+    public function getFavoriteMovies(array $filters = [], $method = 'GET'): JsonResponse | array
     {
-        $query = http_build_query($filters);
+        if ($method === 'GET') {
+            $query = http_build_query($filters);
 
-        if (!empty($query)) {
-            $query = '?' . $query;
+            if (!empty($query)) {
+                $query = '?' . $query;
+            }
+
+            $response = Http::withToken(config('services.tmdb.api_key') )
+                    ->get(config('services.tmdb.endpoint_favorite_movies') . $query);
+
+            if ($response->failed() || $response->status() === 404) {
+                return [
+                    'message' => 'Favorite movies not found or something went wrong.',
+                    'data'    => $response->json(),
+                ];
+            }
+
+            return $response->json();
         }
 
-        $response = Http::withToken(config('services.tmdb.api_key') )
-                ->get(config('services.tmdb.endpoint_favorite_movies') . $query);
+        if ($method === 'POST') {
+            $response = Http::withToken(config('services.tmdb.api_key') )
+                    ->get(config('services.tmdb.endpoint_favorite_movies'));
+
+            if ($response->failed() || $response->status() === 404) {
+                return [
+                    'message' => 'Favorite movies not found or something went wrong.',
+                    'data'    => $response->json(),
+                ];
+            }
+
+            $response = Http::withToken(config('services.tmdb.api_key') )
+                    ->get(config('services.tmdb.endpoint_favorite_movies') . '?page=' . $response->json()['total_pages']);
+
+            if ($response->failed() || $response->status() === 404) {
+                return [
+                    'message' => 'Favorite movies not found or something went wrong.',
+                    'data'    => $response->json(),
+                ];
+            }
+
+            return $response->json();
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array $body ['media_type', 'media_id', 'favorite']
+     * @param string $sessionId
+     * @return : JsonResponse | array
+     */
+    public function addFavoriteMovie(array $body, string $sessionId): JsonResponse | array
+    {
+        $sessionId = isset($sessionId) && $sessionId !== null
+            ? '?session_id=' . urlencode(trim($sessionId))
+            : '';
+
+        $response = Http::withToken(config('services.tmdb.api_key'))
+            ->post(config('services.tmdb.endpoint_add_favorite_movies') . $sessionId, [
+                'media_type' => $body['media_type'],
+                'media_id' => $body['media_id'],
+                'favorite' => $body['favorite'],
+            ]);
 
         if ($response->failed() || $response->status() === 404) {
-            return response()->json([
-                'message' => 'Favorite movies not found or something went wrong.',
+            return [
+                'success' => false,
+                'message' => 'Movie not found or something went wrong.',
                 'data'    => $response->json(),
-            ]);
+            ];
         }
 
         return $response->json();
@@ -47,10 +105,10 @@ class MoviesApiService
                 ->get(config('services.tmdb.endpoint_movies') . $filterParam);
 
         if ($response->failed() || $response->status() === 404) {
-            return response()->json([
+            return [
                 'message' => 'Movies not found or something went wrong.',
                 'data'    => $response->json(),
-            ]);
+            ];
         }
 
         return $response->json();
@@ -70,10 +128,10 @@ class MoviesApiService
             ->get(config('services.tmdb.endpoint_one_movie') . $filterMovie);
 
         if ($response->failed() || $response->status() === 404) {
-            return response()->json([
-                'message' => 'Movie not found or something went wrong.',
+            return [
+                'message' => 'Movies not found or something went wrong.',
                 'data'    => $response->json(),
-            ]);
+            ];
         }
 
         return $response->json();
