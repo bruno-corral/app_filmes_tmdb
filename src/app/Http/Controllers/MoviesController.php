@@ -54,6 +54,30 @@ class MoviesController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function showFavoriteMovies(Request $request): JsonResponse
+    {
+        $filters = $request->query();
+
+        $filters = array_intersect_key($filters, array_flip(['language', 'page', 'sort_by']));
+
+        $movies = $this->moviesApiService->getFavoriteMovies($filters);
+
+        if (empty($movies['results'])) {
+            return response()->json([
+                'message' => 'Favorite movies not found.',
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Favorite movies retrieved successfully.',
+            'data'    => $movies,
+        ]);
+    }
+
+    /**
      * @param MoviesRequest $request
      * @return JsonResponse
      */

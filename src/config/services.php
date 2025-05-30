@@ -39,6 +39,7 @@ return [
         'api_key' => env('TMDB_API_KEY'),
         'endpoint_movies' => env('TMDB_ENDPOINT_MOVIES'),
         'endpoint_one_movie' => env('TMDB_ENDPOINT_ONE_MOVIE'),
+        'endpoint_favorite_movies' => env('TMDB_ENDPOINT_FAVORITE_MOVIES'),
     ],
 
 ];
