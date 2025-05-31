@@ -64,17 +64,12 @@ class MoviesApiService
 
     /**
      * @param array $body ['media_type', 'media_id', 'favorite']
-     * @param string $sessionId
      * @return : JsonResponse | array
      */
-    public function addFavoriteMovie(array $body, string $sessionId): JsonResponse | array
+    public function addFavoriteMovie(array $body): JsonResponse | array
     {
-        $sessionId = isset($sessionId) && $sessionId !== null
-            ? '?session_id=' . urlencode(trim($sessionId))
-            : '';
-
         $response = Http::withToken(config('services.tmdb.api_key'))
-            ->post(config('services.tmdb.endpoint_add_favorite_movies') . $sessionId, [
+            ->post(config('services.tmdb.endpoint_add_favorite_movies') . '?session_id=' . config('services.tmdb.endpoint_session_id'), [
                 'media_type' => $body['media_type'],
                 'media_id' => $body['media_id'],
                 'favorite' => $body['favorite'],

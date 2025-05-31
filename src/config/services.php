@@ -42,6 +42,7 @@ return [
         'endpoint_favorite_movies' => env('TMDB_ENDPOINT_FAVORITE_MOVIES'),
         'endpoint_add_favorite_movies' => env('TMDB_ENDPOINT_ADD_FAVORITE_MOVIES'),
         'endpoint_genres' => env('TMDB_ENDPOINT_GENRES'),
+        'endpoint_session_id' => env('TMDB_SESSION_ID'),
     ],
 
 ];

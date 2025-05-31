@@ -92,10 +92,8 @@ class MoviesController extends Controller
             'media_id',
             'favorite',
         ]);
-
-        $sessionId = $request->query('session_id');
-
-        $movieCreatedOnApi = $this->moviesApiService->addFavoriteMovie($data, $sessionId);
+        
+        $movieCreatedOnApi = $this->moviesApiService->addFavoriteMovie($data);
 
         if ($movieCreatedOnApi['success'] === false) {
             return [
