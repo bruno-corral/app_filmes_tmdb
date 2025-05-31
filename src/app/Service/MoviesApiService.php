@@ -118,10 +118,10 @@ class MoviesApiService
      * @param string $filter
      * @return : JsonResponse | array
      */
-    public function getSearchedMovie(array $filter): JsonResponse | array
+    public function getSearchedMovie($movie): JsonResponse | array
     {
-        $filterMovie = isset($filter['query']) && $filter['query'] !== null
-            ? '?query=' . urlencode(trim($filter['query']))
+        $filterMovie = isset($movie) && $movie !== null
+            ? '?query=' . urlencode(trim($movie))
             : '';
             
         $response = Http::withToken(config('services.tmdb.api_key'))

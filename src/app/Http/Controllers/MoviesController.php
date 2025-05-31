@@ -41,15 +41,13 @@ class MoviesController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function show(Request $request): JsonResponse
+    public function show($movie): JsonResponse
     {
-        $filter = $request->query();
-
-        $movie = $this->moviesApiService->getSearchedMovie($filter);
+        $movie = $this->moviesApiService->getSearchedMovie($movie);
 
         if (empty($movie['results'])) {
             return response()->json([
-                'message' => 'Movie not found.',
+                'message' => 'Movie not foundDD.',
             ]);
         }
 
