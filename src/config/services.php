@@ -41,6 +41,7 @@ return [
         'endpoint_one_movie' => env('TMDB_ENDPOINT_ONE_MOVIE'),
         'endpoint_favorite_movies' => env('TMDB_ENDPOINT_FAVORITE_MOVIES'),
         'endpoint_add_favorite_movies' => env('TMDB_ENDPOINT_ADD_FAVORITE_MOVIES'),
+        'endpoint_genres' => env('TMDB_ENDPOINT_GENRES'),
     ],
 
 ];

@@ -136,4 +136,27 @@ class MoviesApiService
 
         return $response->json();
     }
+
+    /**
+     * @param string $filter
+     * @return : JsonResponse | array
+     */
+    public function getGenres(array $filter): JsonResponse | array
+    {
+        $filterParam = isset($filter['language']) && $filter['language'] !== null
+            ? '?language=' . urlencode(trim($filter['language']))
+            : '';
+
+        $response = Http::withToken(config('services.tmdb.api_key') )
+                ->get(config('services.tmdb.endpoint_genres') . $filterParam);
+
+        if ($response->failed() || $response->status() === 404) {
+            return [
+                'message' => 'Genres not found or something went wrong.',
+                'data'    => $response->json(),
+            ];
+        }
+
+        return $response->json();
+    }
 }

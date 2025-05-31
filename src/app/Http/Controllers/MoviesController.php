@@ -134,6 +134,22 @@ class MoviesController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function genres(Request $request): JsonResponse
+    {
+        $filter = $request->query();
+
+        $genres = $this->moviesApiService->getGenres($filter);
+
+        return response()->json([
+            'message' => 'Genres retrieved successfully.',
+            'data'    => $genres,
+        ]);
+    }
+
+    /**
      * @param string $id
      * @return JsonResponse
      */
