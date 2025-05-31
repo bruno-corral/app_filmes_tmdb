@@ -24,6 +24,12 @@ class MoviesController extends Controller
 
         $movies = $this->moviesApiService->getMovies($filter);
 
+        if (empty($movies['results'])) {
+            return response()->json([
+                'message' => 'Movies not found.',
+            ]);
+        }
+
         return response()->json([
             'message' => 'Movies retrieved successfully.',
             'data'    => $movies,
@@ -79,34 +85,6 @@ class MoviesController extends Controller
             'message' => 'Favorite movies retrieved successfully.',
             'data'    => $movies,
         ]);
-    }
-
-    /**
-     * @param MoviesRequest $request
-     * @return JsonResponse
-     */
-    public function store(MoviesRequest $request): JsonResponse
-    {
-        $data = $request->only([
-            'tmdb_id',
-            'title',
-            'overview',
-            'popularity',
-            'poster_path',
-            'release_date',
-            'vote_average',
-            'vote_count',
-            'adult',
-            'genre_ids',
-        ]);
-
-        $movie = $this->moviesRepository->store($data);
-
-        return response()->json([
-            'message' => 'Movie created successfully.',
-            'data'    => $movie,
-        ]);
-        
     }
 
     public function storeFavoriteMovie(Request $request)

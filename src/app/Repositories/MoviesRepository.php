@@ -8,17 +8,9 @@ class MoviesRepository
 {
     public function __construct(public Movie $movie) {}
     
-    public function index($filter = [])
+    public function index()
     {
-        $query = $this->movie->query();
-
-         if (!empty($filter['genre'])) {
-            $query->where('full_name', 'like', $filter['full_name'] . '%');
-        }
-
-        $movies = $this->movie->all();
-
-        return $movies;
+        return $this->movie->all();
     }
 
     public function show($id)
