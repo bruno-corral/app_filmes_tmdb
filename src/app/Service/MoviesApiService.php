@@ -9,50 +9,51 @@ use Illuminate\Support\Facades\Http;
 class MoviesApiService
 {
     /**
-     * @param string $method
+     * @param string $currentPage
      * @return JsonResponse | array
      */
-    public function getFavoriteMovies(string $method = 'GET', string $currentPage): JsonResponse | array
+    public function getFavoriteMovies(string $currentPage): JsonResponse | array
     {
-        if ($method === 'GET') {
-            $response = Http::withToken(config('services.tmdb.api_key') )
-                    ->get(config('services.tmdb.endpoint_favorite_movies') . '?page=' . $currentPage);
+        $response = Http::withToken(config('services.tmdb.api_key') )
+                ->get(config('services.tmdb.endpoint_favorite_movies') . '?page=' . $currentPage);
 
-            if ($response->failed() || $response->status() === 404) {
-                return [
-                    'message' => 'Favorite movies not found or something went wrong.',
-                    'data'    => $response->json(),
-                ];
-            }
-
-            return $response->json();
+        if ($response->failed() || $response->status() === 404) {
+            return [
+                'message' => 'Favorite movies not found or something went wrong.',
+                'data'    => $response->json(),
+            ];
         }
 
-        if ($method === 'POST') {
-            $response = Http::withToken(config('services.tmdb.api_key') )
+        return $response->json();
+    }
+
+    /**
+     * @param string $currentPage
+     * @return JsonResponse | array
+     */
+    public function getLastPageOnFavoriteMovies(): JsonResponse | array
+    {
+        $response = Http::withToken(config('services.tmdb.api_key') )
                     ->get(config('services.tmdb.endpoint_favorite_movies'));
 
-            if ($response->failed() || $response->status() === 404) {
-                return [
-                    'message' => 'Favorite movies not found or something went wrong.',
-                    'data'    => $response->json(),
-                ];
-            }
-
-            $response = Http::withToken(config('services.tmdb.api_key') )
-                    ->get(config('services.tmdb.endpoint_favorite_movies') . '?page=' . $response->json()['total_pages']);
-
-            if ($response->failed() || $response->status() === 404) {
-                return [
-                    'message' => 'Favorite movies not found or something went wrong.',
-                    'data'    => $response->json(),
-                ];
-            }
-
-            return $response->json();
+        if ($response->failed() || $response->status() === 404) {
+            return [
+                'message' => 'Favorite movies not found or something went wrong.',
+                'data'    => $response->json(),
+            ];
         }
 
-        return [];
+        $response = Http::withToken(config('services.tmdb.api_key') )
+                ->get(config('services.tmdb.endpoint_favorite_movies') . '?page=' . $response->json()['total_pages']);
+
+        if ($response->failed() || $response->status() === 404) {
+            return [
+                'message' => 'Favorite movies not found or something went wrong.',
+                'data'    => $response->json(),
+            ];
+        }
+
+        return $response->json();
     }
 
     /**
