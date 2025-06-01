@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\MoviesRequest;
 use App\Repositories\MoviesRepository;
 use App\Service\MoviesApiService;
 use Illuminate\Http\JsonResponse;
@@ -63,15 +62,7 @@ class MoviesController extends Controller
      */
     public function showFavoriteMovies(Request $request): JsonResponse
     {
-        $filters = $request->only([
-            'language',
-            'page',
-            'sort_by',
-        ]);
-
-        $filters = array_intersect_key($filters, array_flip(['language', 'page', 'sort_by']));
-
-        $movies = $this->moviesApiService->getFavoriteMovies($filters, $request->method());
+        $movies = $this->moviesApiService->getFavoriteMovies($request->method(), $request->currentPage);
 
         if (empty($movies['results'])) {
             return response()->json([
@@ -85,15 +76,15 @@ class MoviesController extends Controller
         ]);
     }
 
-    public function storeFavoriteMovie(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function storeFavoriteMovie(Request $request): JsonResponse | array
     {
-        $data = $request->only([
-            'media_type',
-            'media_id',
-            'favorite',
-        ]);
-        
-        $movieCreatedOnApi = $this->moviesApiService->addFavoriteMovie($data);
+        $movieId = trim($request->movieId);
+
+        $movieCreatedOnApi = $this->moviesApiService->addFavoriteMovie($movieId);
 
         if ($movieCreatedOnApi['success'] === false) {
             return [

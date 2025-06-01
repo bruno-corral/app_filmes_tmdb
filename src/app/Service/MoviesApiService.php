@@ -9,21 +9,14 @@ use Illuminate\Support\Facades\Http;
 class MoviesApiService
 {
     /**
-     * @param array $filters = ['language', 'page', 'sort_by']
      * @param string $method
      * @return JsonResponse | array
      */
-    public function getFavoriteMovies(array $filters = [], $method = 'GET'): JsonResponse | array
+    public function getFavoriteMovies(string $method = 'GET', string $currentPage): JsonResponse | array
     {
         if ($method === 'GET') {
-            $query = http_build_query($filters);
-
-            if (!empty($query)) {
-                $query = '?' . $query;
-            }
-
             $response = Http::withToken(config('services.tmdb.api_key') )
-                    ->get(config('services.tmdb.endpoint_favorite_movies') . $query);
+                    ->get(config('services.tmdb.endpoint_favorite_movies') . '?page=' . $currentPage);
 
             if ($response->failed() || $response->status() === 404) {
                 return [
@@ -63,16 +56,16 @@ class MoviesApiService
     }
 
     /**
-     * @param array $body ['media_type', 'media_id', 'favorite']
+     * @param integer $movieId
      * @return : JsonResponse | array
      */
-    public function addFavoriteMovie(array $body): JsonResponse | array
+    public function addFavoriteMovie(int $movieId): JsonResponse | array
     {
         $response = Http::withToken(config('services.tmdb.api_key'))
             ->post(config('services.tmdb.endpoint_add_favorite_movies') . '?session_id=' . config('services.tmdb.endpoint_session_id'), [
-                'media_type' => $body['media_type'],
-                'media_id' => $body['media_id'],
-                'favorite' => $body['favorite'],
+                'media_type' => "movie",
+                'media_id' => $movieId,
+                'favorite' => true,
             ]);
 
         if ($response->failed() || $response->status() === 404) {
