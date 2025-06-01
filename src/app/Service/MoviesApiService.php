@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 
@@ -28,7 +27,6 @@ class MoviesApiService
     }
 
     /**
-     * @param string $currentPage
      * @return JsonResponse | array
      */
     public function getLastPageOnFavoriteMovies(): JsonResponse | array
@@ -81,17 +79,13 @@ class MoviesApiService
     }
 
     /**
-     * @param string $filter
+     * @param string $currentPage
      * @return JsonResponse | array
      */
-    public function getMovies(array $filter): JsonResponse | array
+    public function getMovies(string $currentPage): JsonResponse | array
     {
-        $filterParam = isset($filter['with_genres']) && $filter['with_genres'] !== null
-            ? '?with_genres=' . urlencode(trim($filter['with_genres']))
-            : '';
-
         $response = Http::withToken(config('services.tmdb.api_key') )
-                ->get(config('services.tmdb.endpoint_movies') . $filterParam);
+                ->get(config('services.tmdb.endpoint_movies') . '?page=' . $currentPage);
 
         if ($response->failed() || $response->status() === 404) {
             return [
@@ -104,7 +98,7 @@ class MoviesApiService
     }
 
     /**
-     * @param string $filter
+     * @param string $movie
      * @return : JsonResponse | array
      */
     public function getSearchedMovie($movie): JsonResponse | array

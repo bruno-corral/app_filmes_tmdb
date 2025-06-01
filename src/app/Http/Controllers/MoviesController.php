@@ -19,9 +19,7 @@ class MoviesController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $filter = $request->query();
-
-        $movies = $this->moviesApiService->getMovies($filter);
+        $movies = $this->moviesApiService->getMovies($request->currentPage);
 
         if (empty($movies['results'])) {
             return response()->json([
@@ -84,8 +82,6 @@ class MoviesController extends Controller
     {
         $movieId = trim($request->movieId);
 
-        info($movieId);
-
         $movieCreatedOnApi = $this->moviesApiService->addFavoriteMovie($movieId);
 
         if ($movieCreatedOnApi['success'] === false) {
@@ -97,8 +93,6 @@ class MoviesController extends Controller
         $favoriteMoviesOnLastPage = $this->moviesApiService->getLastPageOnFavoriteMovies();
 
         $lastMovie = collect(collect($favoriteMoviesOnLastPage)->get('results'))->last();
-
-        info($lastMovie);
 
         $data = [
             'tmdb_id' => $lastMovie['id'],
